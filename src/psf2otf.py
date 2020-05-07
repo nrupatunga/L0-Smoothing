@@ -10,9 +10,10 @@ Notes: In order to understand psf2otf:
 FFT does cyclic convolution. To understand what cyclic convolution is
 please refer to the document below (also in the docs)
 https://www.docdroid.net/YSKkZ5Y/fft-based-2d-cyclic-convolution-pdf#page=5
-
-
 """
+from typing import Optional
+
+import matplotlib.pyplot as plt
 import numpy as np
 
 
@@ -31,7 +32,25 @@ def circshift(psf: np.ndarray, shift: np.ndarray) -> np.ndarray:
     return psf
 
 
-def psf2otf(psf: np.ndarray, out_size: tuple):
+def surf_plot(data: np.ndarray):
+
+    x = np.linspace(0, data.shape[1], data.shape[1])
+    y = np.linspace(0, data.shape[0], data.shape[0])
+    x, y = np.meshgrid(x, y)
+    z = np.abs(data)
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.plot_surface(x, y, z, cmap='viridis')
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    ax.set_zlabel('z')
+    ax.set_title('surface plot')
+    plt.show()
+
+
+def psf2otf(psf: np.ndarray, out_size: tuple, show_plot:
+            Optional[bool] = False) -> np.ndarray:
     """Implementation of matlab's psf2otf
 
     @psf: point spread function
@@ -49,10 +68,32 @@ def psf2otf(psf: np.ndarray, out_size: tuple):
     new_psf = circshift(new_psf, -np.floor(psf_size / 2))
 
     otf = np.fft.fftn(new_psf)
+
+    if show_plot:
+        surf_plot(new_psf)
+        surf_plot(otf)
+
     return np.complex64(otf)
 
 
 if __name__ == "__main__":
     psf = np.asarray([[-1, 1]])
-    out_size = (494, 475)
-    psf2otf(psf, out_size)
+    out_size = (28, 28)
+    otfx = psf2otf(psf, out_size, False)
+    psf = np.asarray([[-1], [1]])
+    out_size = (28, 28)
+    otfy = psf2otf(psf, out_size, False)
+
+    Denormin2 = np.square(abs(otfx)) + np.square(abs(otfy))
+    x = np.linspace(0, 28, 28)
+    y = np.linspace(0, 28, 28)
+    z = Denormin2
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.contour3D(x, y, z, 120)
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    ax.set_zlabel('z')
+    ax.set_title('psf')
+    plt.show()
