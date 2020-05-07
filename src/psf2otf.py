@@ -4,6 +4,14 @@ Author: Nrupatunga
 Email: nrupatunga.s@byjus.com
 Github: https://github.com/nrupatunga
 Description: Implementation of matlab's psf2otf
+
+Notes: In order to understand psf2otf:
+
+FFT does cyclic convolution. To understand what cyclic convolution is
+please refer to the document below (also in the docs)
+https://www.docdroid.net/YSKkZ5Y/fft-based-2d-cyclic-convolution-pdf#page=5
+
+
 """
 import numpy as np
 

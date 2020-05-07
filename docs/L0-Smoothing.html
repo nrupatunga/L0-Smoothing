@@ -1,0 +1,77 @@
+     <meta charset="utf-8" lang="en"><style class="fallback">body{visibility:hidden;}</style>
+
+			  **Image Smoothing using L0 Gradient Minimization**
+                                        Nrupatunga
+
+# Overview
+This document describes different parts of the algorithmic implementation of
+L0-Smoothing in Python
+
+Basically we are implementing below equation from the [paper](http://www.cse.cuhk.edu.hk/~leojia/papers/L0smooth_Siggraph_Asia2011.pdf):
+$$S=\mathscr{F}^{-1}\left(\frac{\mathscr{F}(I)+\beta\left(\mathscr{F}\left(\partial_{x}\right)^{*} \mathscr{F}(h)+\mathscr{F}\left(\partial_{y}\right)^{*} \mathscr{F}(v)\right)}{\mathscr{F}(1)+\beta\left(\mathscr{F}\left(\partial_{x}\right)^{*} \mathscr{F}\left(\partial_{x}\right)+\mathscr{F}\left(\partial_{y}\right)^{*} \mathscr{F}\left(\partial_{y}\right)\right)}\right)$$
+
+$\mathscr{F}$: Fourier transform, $\partial_{x}$: gradient in x-direction, $\partial_{y}$: gradient in y-direction. $I$: Input
+$S$: output image
+
+$$\left(h_{p}, v_{p}\right)=\left\{\begin{array}{ll}
+(0,0) & \left(\partial_{x} S_{p}\right)^{2}+\left(\partial_{y} S_{p}\right)^{2} \leq \lambda / \beta \\
+\left(\partial_{x} S_{p}, \partial_{y} S_{p}\right) & \text { otherwise }
+\end{array}\right.$$
+
+Brief understanding: 
+- First from the input image, take the horizontal and vertical gradient of the image.
+
+- Then we have some edges (some with strong gradients, some with medium gradients, some with weak gradients).
+
+- Now, we threshold some of these gradients to zero them out using the condition $\left(\partial_{x} S_{p}\right)^{2}+\left(\partial_{y} S_{p}\right)^{2} \leq \lambda / \beta$. $\lambda$ and $\beta$ are the hyperparameters.
+
+- Intuitively, this means that, we want the output $S$ to have the new set of gradients after applying this condition.
+
+- This is nothing but we are reducing the number of edges in the output image $S$ that are not strong. $h_{p}$ and $v_{p}$ is what we find.
+
+Before implementing the algorithm, I went through the theory in Gonzalez Digital Image Processing book, chapter-4.
+This is really a great intro to Fourier Transform properties.
+
+**TODO**: Write some important properties of Fourier Transform, that we need to remember.
+
+psf2otf
+----------------------------------------------------------------------------------------
+This function takes the input filter (kernel) in our case it is [-1, 1] or [-1;
+1] and circularly shifts the kernel while making the size of the input
+kernel same as that of the image. After that we take the FFT
+
+While implementing this function, I got stuck wondering why we shift the
+kernel circularly, it is basically because FFT does cyclic convolution. Below is what I mean by that.
+
+The given kernel is padded with zeros first to match the input image dims,
+then we circularly shift to make the center of kernel to be at (0, 0) as shown in Figure [CycShift]
+
+![Figure [CycShift]: Step-1 Cyclic Shift](images/cyclicshift.png width="1280px")
+
+Figure [Cycconv1] shows the cyclic convolution for non-border pixels
+
+![Figure [Cycconv1]: Cyclic Convolution Non Border Case](images/cyclicconv1.png width="1280px")
+
+Figure [Cycconv2] shows the cyclic convolution for border pixels
+
+![Figure [Cycconv2]: Cyclic Convolution Border Case](images/cyclicconv2.png width="1280px")
+
+Figure [Cycconv2] and Figure [Cycconv1], is showing the cyclic convolution in spatial domain, and FFT(input) .* FFT(cyclic shifted kernel)
+does the same job as (input) convolution with (cyclic shifted kernel)
+
+
+Reference to Cyclic Convolution
+----------------------------------------------------------------------------------------
+In order to read more and verify, refer to following document and the code
+
+Document: [FFT implements cyclic
+convolution](https://www.docdroid.net/YSKkZ5Y/fft-based-2d-cyclic-convolution-pdf#page=5)
+
+Code: [Matlab
+implementation of Cyclic Convolution](https://github.com/RoyiAvital/StackExchangeCodes/blob/master/SignalProcessing/Q38542/Q38542.m)
+
+Python implementation: [psf2otf](https://github.com/nrupatunga/L0-Smoothing/blob/master/src/psf2otf.py)
+
+<style class="fallback">body{visibility:hidden}</style><script>markdeepOptions={tocStyle:'medium'};</script>
+<!-- Markdeep: --><script src="https://casual-effects.com/markdeep/latest/markdeep.min.js?" charset="utf-8"></script>
+
