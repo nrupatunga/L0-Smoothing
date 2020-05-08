@@ -13,6 +13,7 @@ from typing import Optional
 
 import cv2
 import numpy as np
+from scipy.fftpack import fft2, ifft2
 
 from psf2otf import psf2otf
 
@@ -32,10 +33,8 @@ class L0Smoothing:
 
     def run(self):
         """L0 smoothing imlementation"""
-        img = cv2.imread(self._img_path)
-        S = cv2.normalize(img, None, alpha=0, beta=1,
-                          norm_type=cv2.NORM_MINMAX,
-                          dtype=cv2.CV_32F)
+        img = cv2.imread(self._img_path, 0)
+        S = img / 256
         if S.ndim < 3:
             S = S[..., np.newaxis]
 
@@ -49,7 +48,8 @@ class L0Smoothing:
         psf = np.asarray([[-1], [1]])
         otfy = psf2otf(psf, out_size)
 
-        Normin1 = np.fft.fft2(np.squeeze(S), axes=(0, 1))
+        # Normin1 = np.fft.fft2(np.squeeze(S), axes=(0, 1))
+        Normin1 = fft2(np.squeeze(S), axes=(0, 1))
         Denormin2 = np.square(abs(otfx)) + np.square(abs(otfy))
         if D > 1:
             Denormin2 = Denormin2[..., np.newaxis]
@@ -92,11 +92,13 @@ class L0Smoothing:
             v_diff = np.vstack([first_row, v_diff])
 
             Normin2 = h_diff + v_diff
-            Normin2 = beta * np.fft.fft2(Normin2, axes=(0, 1))
+            # Normin2 = beta * np.fft.fft2(Normin2, axes=(0, 1))
+            Normin2 = beta * fft2(Normin2, axes=(0, 1))
 
             FS = np.divide(np.squeeze(Normin1) + np.squeeze(Normin2),
                            Denormin)
-            S = np.real(np.fft.ifft2(FS, axes=(0, 1)))
+            # S = np.real(np.fft.ifft2(FS, axes=(0, 1)))
+            S = np.real(ifft2(FS, axes=(0, 1)))
             if False:
                 S_new = S * 256
                 S_new = S_new.astype(np.uint8)
@@ -111,13 +113,12 @@ class L0Smoothing:
 
 
 if __name__ == "__main__":
-    img_path = './pflower.jpg'
+    img_path = './stripes_jet.png'
     img = cv2.imread(img_path)
-    S = L0Smoothing(img_path, param_lambda=0.01).run()
+    S = L0Smoothing(img_path, param_lambda=2.5e-1, param_kappa=1.05).run()
     S = np.squeeze(S)
-    S = cv2.normalize(S, None, alpha=0, beta=255,
-                      norm_type=cv2.NORM_MINMAX,
-                      dtype=cv2.CV_32F)
+    S = np.clip(S, 0, 1)
+    S = S * 255
     S = S.astype(np.uint8)
     cv2.imshow('Input', img)
     cv2.imshow('L0-Smooth', S)
