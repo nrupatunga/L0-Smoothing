@@ -27,12 +27,13 @@ if not os.path.exists(out_dir):
 
 for i, img_path in tqdm(enumerate(image_files)):
     img = cv2.imread(img_path, 0)
-    fig, axs = plt.subplots(1, 2)
-    n, _, _ = axs[0].hist(img.ravel() / 255, bins=256, range=(0.0, 0.5), fc='k', ec='k')
-    ratio = sum(n) / (img.shape[0] * img.shape[1])
+    if False:
+        fig, axs = plt.subplots(1, 2)
+        n, _, _ = axs[0].hist(img.ravel() / 255, bins=256, range=(0.0, 0.5), fc='k', ec='k')
+        ratio = sum(n) / (img.shape[0] * img.shape[1])
 
     start = time.time()
-    S = L0Smoothing(img_path, param_lambda=ratio / 2).run()
+    S = L0Smoothing(img_path, param_lambda=0.02).run()
     print('Time taken for one image: {}'.format(time.time() - start))
     S = np.squeeze(S)
     S = np.clip(S, 0, 1)
@@ -41,11 +42,12 @@ for i, img_path in tqdm(enumerate(image_files)):
     out = np.concatenate((img, S), axis=1)
     out_path = os.path.join(out_dir, str(i) + '.bmp')
 
-    print('Ratio = {}'.format(ratio))
-    axs[1].imshow(out)
-    axs[0].axis('off')
-    axs[1].axis('off')
-    plt.draw()
-    plt.waitforbuttonpress(0)
-    plt.close()
-    # cv2.imwrite(out_path, out)
+    if False:
+        print('Ratio = {}'.format(ratio))
+        axs[1].imshow(out)
+        axs[0].axis('off')
+        axs[1].axis('off')
+        plt.draw()
+        plt.waitforbuttonpress(0)
+        plt.close()
+    cv2.imwrite(out_path, out)
