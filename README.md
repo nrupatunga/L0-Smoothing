@@ -26,9 +26,9 @@
 This repository contains the Python implementation of the paper:
 [Image Smoothing via L0 Gradient Minimization](ihttp://www.cse.cuhk.edu.hk/~leojia/papers/L0smooth_Siggraph_Asia2011.pdf)
 
-|Flower           |  Basketball |
-|------------------------|-------------------------|
-|![](https://github.com/nrupatunga/L0-Smoothing/blob/master/src/output/flower.png)  | ![](https://github.com/nrupatunga/L0-Smoothing/blob/master/src/output/basketball.png) |
+|           |
+|------------------------|
+|![](https://github.com/nrupatunga/L0-Smoothing/blob/master/src/output/basketball.png) |
 
 <!--GETTING STARTED-->
 ## Getting Started
