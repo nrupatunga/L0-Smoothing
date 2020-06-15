@@ -23,7 +23,8 @@
 <!--ABOUT THE PROJECT-->
 ## About the Project
 
-This repository contains the Python implementation of the [paper](http://www.cse.cuhk.edu.hk/~leojia/papers/L0smooth_Siggraph_Asia2011.pdf)
+This repository is the Python implementation of the paper:
+[Image Smoothing via L0 Gradient Minimization](http://www.cse.cuhk.edu.hk/~leojia/papers/L0smooth_Siggraph_Asia2011.pdf)
 
 |Flower     | Rock
 |-----------|-------------|
