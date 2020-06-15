@@ -131,3 +131,4 @@ dmypy.json
 tags
 docs/images/.DS_Store
 .vscode/settings.json
+*.bmp

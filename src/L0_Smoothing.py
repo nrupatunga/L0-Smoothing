@@ -1,5 +1,5 @@
 """
-File: L0Smoothing.py
+File: L0_Smoothing.py
 Author: Nrupatunga
 Email: nrupatunga.s@byjus.com
 Github: https://github.com/nrupatunga
@@ -31,9 +31,13 @@ class L0Smoothing:
         self._img_path = img_path
         self._beta_max = 1e5
 
-    def run(self):
+    def run(self, isGray=False):
         """L0 smoothing imlementation"""
-        img = cv2.imread(self._img_path, 0)
+        if isGray:
+            img = cv2.imread(self._img_path, 0)
+        else:
+            img = cv2.imread(self._img_path)
+
         S = img / 256
         if S.ndim < 3:
             S = S[..., np.newaxis]
@@ -48,7 +52,6 @@ class L0Smoothing:
         psf = np.asarray([[-1], [1]])
         otfy = psf2otf(psf, out_size)
 
-        # Normin1 = np.fft.fft2(np.squeeze(S), axes=(0, 1))
         Normin1 = fft2(np.squeeze(S), axes=(0, 1))
         Denormin2 = np.square(abs(otfx)) + np.square(abs(otfy))
         if D > 1:
@@ -113,14 +116,14 @@ class L0Smoothing:
 
 
 if __name__ == "__main__":
-    img_path = './stripes_jet.png'
+    img_path = './images/pflower.jpg'
     img = cv2.imread(img_path)
-    S = L0Smoothing(img_path, param_lambda=2.5e-1, param_kappa=1.05).run()
+    S = L0Smoothing(img_path, param_lambda=0.01).run()
     S = np.squeeze(S)
     S = np.clip(S, 0, 1)
     S = S * 255
     S = S.astype(np.uint8)
-    cv2.imshow('Input', img)
-    cv2.imshow('L0-Smooth', S)
+    out = np.hstack((img, S))
+    cv2.imshow('L0-Smooth-Output', out)
+    cv2.imwrite('output_python.png', out)
     cv2.waitKey(0)
-    cv2.imwrite('output_python.png', S)
