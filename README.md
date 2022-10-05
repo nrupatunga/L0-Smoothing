@@ -5,7 +5,7 @@
   <p align="center">
     <br />
     <a
-    href="http://www.nthere.in/2020/06/15/Image-Smoothing-using-L0-Gradient-Minimization/">Blog
+    href="http://www.nthere.dev/2020/06/15/Image-Smoothing-using-L0-Gradient-Minimization/">Blog
     Post</a>
     |
     <a href="https://github.com/nrupatunga/L0-Smoothing/issues">Report Bug</a>
